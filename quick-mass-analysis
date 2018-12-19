@@ -1,0 +1,16 @@
+# Load Forecast library
+library("forecast")
+
+# Importing data (Enter file directory under brackets)
+data <- read.csv("/home/username/Desktop/test.csv", header=TRUE)
+
+# Print data
+data
+
+# AUTO ARIMA for dataset for different articles
+model_fits <- group_by(data, article) %>% do(fit=auto.arima(.$use))
+
+model_fits
+
+# Print mean and standard error estimates for articles
+model_fits$fit
