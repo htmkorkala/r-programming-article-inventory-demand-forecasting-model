@@ -2,7 +2,7 @@
 library("forecast")
 
 # Importing data (Enter file directory under brackets)
-data <- read.csv("/home/username/Desktop/test.csv", header=TRUE)
+data <- read.csv("/home/username/Desktop/mass_analysis_example.csv", header=TRUE)
 
 # Print data
 data
