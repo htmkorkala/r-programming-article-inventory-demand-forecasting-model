@@ -1,0 +1,60 @@
+# Loading necessary library for forecasting
+library("forecast")
+
+# Importing data
+data <- read.csv("/home/user/Desktop/article_use.csv", header=TRUE)
+
+# Print data
+data
+
+# Seasonal AUTO ARIMA model
+fit_w_seasonality = auto.arima(data$use, seasonal=TRUE)
+fit_w_seasonality
+
+# Plot seasonal AUTO ARIMA model
+seas_fcast <- forecast(fit_w_seasonality, h=10)
+plot(seas_fcast)
+
+#Residual examination
+fit_w_seasonality
+
+residual <- forecast.Arima(fit_w_seasonality, h=12)
+
+residual
+
+plot.forecast(residual)
+
+# Special function for forecast errors
+
+plotForecastErrors <- function(forecasterrors)
+{
+  # make a histogram of the forecast errors:
+  mybinsize <- IQR(forecasterrors)/4
+  mysd   <- sd(forecasterrors)
+  mymin  <- min(forecasterrors) - mysd*5
+  mymax  <- max(forecasterrors) + mysd*3
+  # generate normally distributed data with mean 0 and standard deviation mysd
+  mynorm <- rnorm(10000, mean=0, sd=mysd)
+  mymin2 <- min(mynorm)
+  mymax2 <- max(mynorm)
+  if (mymin2 < mymin) { mymin <- mymin2 }
+  if (mymax2 > mymax) { mymax <- mymax2 }
+  # make a red histogram of the forecast errors, with the normally distributed data overlaid:
+  mybins <- seq(mymin, mymax, mybinsize)
+  hist(forecasterrors, col="red", freq=FALSE, breaks=mybins)
+  # freq=FALSE ensures the area under the histogram = 1
+  # generate normally distributed data with mean 0 and standard deviation mysd
+  myhist <- hist(mynorm, plot=FALSE, breaks=mybins)
+  # plot the normal curve as a blue line on top of the histogram of forecast errors:
+  points(myhist$mids, myhist$density, type="l", col="blue", lwd=2)
+}
+
+# Tests for residuals
+acf(residual$residuals, lag.max=20)
+
+Box.test(residual$residuals, lag=20, type="Ljung-Box") #alternative = "residuals are not i.i.d. = NOT GOOD FOR THE ASSUMPTIONS OF THE MODEL"
+
+plot.ts(residual$residuals)            # make time plot of forecast errors
+plotForecastErrors(residual$residuals) # make a histogram
+
+mean(residual$residuals)
